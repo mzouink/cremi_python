@@ -18,37 +18,6 @@ python setup.py install
 ```
 or just include the `cremi_python` directory to your `PYTHONPATH`.
 
-Reading and writing of CREMI files
-----------------------------------
-
-We recommend you use the `cremi.io` package for reading and writing of the
-CREMI files. This way, you can be sure that the submissions you produce are of
-the form that is expected by the challenge server, and that compression is
-used.
-
-You open a file by instantiating a `CremiFile` object:
-```python
-from cremi.io import CremiFile
-file = CremiFile("example.hdf", "r")
-```
-The second argument specifies the mode, which is `"r"` for reading, `"w"` for
-writing a new file (careful, this replaces an existing file with the same
-name), and `"a"` to append or change an existing file.
-
-The `CremiFile` class provides read and write methods for each of the challenge
-datasets. To read the neuron IDs in the training volumes, for example, use
-`read_neuron_ids()`:
-```python
-neuron_ids = file.read_neuron_ids()
-```
-This returns the `neuron_ids` as a `cremi.Volume`, which contains an HDF5 dataset (`neuron_ids.data`) and some meta-information. If you are using the padded version of the volumes, `neuron_ids.offset` will contain the starting point of `neuron_ids` inside the `raw` volume. Note that these numbers are given in nm.
-
-To save a dataset, use the appropriate write method, e.g.,:
-```
-file.write_neuron_ids(neuron_ids)
-```
-See the included `example_read.py` and `example_write.py` for more details.
-
 Evaluation
 ----------
 
