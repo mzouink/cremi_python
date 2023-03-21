@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='cremi',
@@ -9,5 +7,10 @@ setup(
     author='Jan Funke',
     author_email='jfunke@iri.upc.edu',
     url='http://github.com/funkey/cremi_python',
-    packages=['cremi', 'cremi.io', 'cremi.evaluation'],
+    packages=['cremi'],
+    install_requires=[
+        "numpy",
+        "h5py",
+        "scipy",
+    ],
 )

@@ -3,6 +3,7 @@ import numpy as np
 from .. import Annotations
 from .. import Volume
 
+
 class CremiFile(object):
 
     def __init__(self, filename, mode):
@@ -22,7 +23,7 @@ class CremiFile(object):
             except ValueError:
                 pass
 
-    def __create_dataset(self, path, data, dtype, compression = None):
+    def __create_dataset(self, path, data, dtype, compression=None):
         """Wrapper around h5py's create_dataset. Creates the group, if not 
         existing. Deletes a previous dataset, if existing and not compatible. 
         Otherwise, replaces the dataset.
@@ -37,7 +38,7 @@ class CremiFile(object):
 
             ds = self.h5file[path]
             if ds.dtype == dtype and ds.shape == np.array(data).shape:
-                print "overwriting existing dataset"
+                print("overwriting existing dataset")
                 self.h5file[path][:] = data[:]
                 return
 
@@ -100,15 +101,17 @@ class CremiFile(object):
             self.h5file["/annotations"].attrs["offset"] = annotations.offset
 
         self.__create_dataset("/annotations/ids", data=annotations.ids(), dtype=np.uint64)
-        self.__create_dataset("/annotations/types", data=annotations.types(), dtype=h5py.special_dtype(vlen=unicode), compression="gzip")
+        self.__create_dataset("/annotations/types", data=annotations.types(), dtype=h5py.string_dtype(encoding='utf-8'))
         self.__create_dataset("/annotations/locations", data=annotations.locations(), dtype=np.double)
 
         if len(annotations.comments) > 0:
             self.__create_dataset("/annotations/comments/target_ids", data=annotations.comments.keys(), dtype=np.uint64)
-            self.__create_dataset("/annotations/comments/comments", data=annotations.comments.values(), dtype=h5py.special_dtype(vlen=unicode))
+            self.__create_dataset("/annotations/comments/comments", data=annotations.comments.values(),
+                                  dtype=h5py.string_dtype(encoding='utf-8'))
 
         if len(annotations.pre_post_partners) > 0:
-            self.__create_dataset("/annotations/presynaptic_site/partners", data=annotations.pre_post_partners, dtype=np.uint64)
+            self.__create_dataset("/annotations/presynaptic_site/partners", data=annotations.pre_post_partners,
+                                  dtype=np.uint64)
 
     def has_raw(self):
         """Check if this file contains a raw volume.
@@ -153,27 +156,6 @@ class CremiFile(object):
         """
 
         return self.read_volume("/volumes/labels/neuron_ids")
-
-    def read_neuron_ids_confidence(self):
-        """Read confidence information about neuron ids.
-        Returns Confidences.
-        """
-
-        confidences = Confidences(num_levels=2)
-        if not self.has_neuron_ids_confidence():
-            return confidences
-
-        data = self.h5file["/volumes/labels/neuron_ids_confidence"]
-        i = 0
-        while i < len(data):
-            level = data[i]
-            i += 1
-            num_ids = data[i]
-            i += 1
-            confidences.add_all(level, data[i:i+num_ids])
-            i += num_ids
-
-        return confidences
 
     def read_clefts(self):
         """Read the volume of segmented synaptic clefts.

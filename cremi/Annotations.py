@@ -1,7 +1,6 @@
 class Annotations:
 
-    def __init__(self, offset = (0.0, 0.0, 0.0)):
-
+    def __init__(self, offset=(0.0, 0.0, 0.0)):
         self.__types = {}
         self.__locations = {}
         self.comments = {}
